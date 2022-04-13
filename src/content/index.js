@@ -4,7 +4,28 @@ import { toCamelCase } from '@/utils/helper';
 import FindElement from '@/utils/find-element';
 import executedBlock from './executed-block';
 import blocksHandler from './blocks-handler';
+function centerInterview(el) {
+  return new Promise(function(resolve, reject){
+    Element.prototype.documentOffsetTop = function () {
+      return this.offsetTop + (this.offsetParent ? this.offsetParent.documentOffsetTop() : 0);
+    };
 
+    var top = el.documentOffsetTop() - (window.innerHeight / 2);
+    window.scrollTo(0, top);
+    resolve("OK");
+  });
+  
+ 
+}
+function isVisible(domElement) {
+  return new Promise(resolve => {
+    const o = new IntersectionObserver(([entry]) => {
+      resolve(entry.intersectionRatio === 1);
+      o.disconnect();
+    });
+    o.observe(domElement);
+  });
+}
 function handleConditionBuilder({ data, type }) {
   if (!type.startsWith('element')) return null;
 
@@ -22,9 +43,14 @@ function handleConditionBuilder({ data, type }) {
   const elementActions = {
     text: () => element.innerText,
     visible: () => {
-      const { visibility, display } = getComputedStyle(element);
-
-      return visibility !== 'hidden' && display !== 'none';
+      var width = element.offsetWidth;
+      var height = element.offsetHeight;
+      if(width===0 || height===0) return false;
+      var result = centerInterview(element).then(data => {
+        return isVisible(element)
+        
+    });
+    return result;
     },
     invisible: () => {
       const { visibility, display } = getComputedStyle(element);
