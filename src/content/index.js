@@ -8,7 +8,7 @@ import blocksHandler from './blocks-handler';
 function handleConditionBuilder({ data, type }) {
   if (!type.startsWith('element')) return null;
 
-  const selectorType = data.selector.startsWith('/') ? 'xpath' : 'cssSelector';
+  const selectorType = (data.selector.startsWith('/')|| data.selector.startsWith('(/')) ? 'xpath' : 'cssSelector';
 
   const element = FindElement[selectorType](data);
   const { 1: actionType } = type.split('#');
